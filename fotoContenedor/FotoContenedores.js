@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
 import { Camera, CameraType } from "expo-camera";
-import * as FileSystem from 'expo-file-system';
+//import { RNCamera } from "react-native-camera";
+//import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import Button from '../src/components/Button';
+import React from 'react';
 
 export default function FotoCont() {
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -21,10 +23,12 @@ export default function FotoCont() {
         })();
     }, []);
 
+    //TOMAR FOTO
     const takePicture = async () => {
         if (cameraRef) {
             try {
-                const data = await cameraRef.current.takePictureAsync();
+                const data = await cameraRef.current.takePictureAsync({});
+                //CameraRoll.saveToCameraRoll(data.uri, "photo");
                 console.log(data);
                 setImage(data.uri)
             } catch (e) {
@@ -32,60 +36,18 @@ export default function FotoCont() {
             }
         }
     }
-
+    //ENVIA A GALERÍA
     const saveImage = async () => {
-        if (image) {
-            const options = { quality: 0.7, base64: true };
-            const data1 = await cameraRef.current.takePictureAsync();
-            console.log(data1);
-            const source = data1.base64;
-
-            if (image) {
-                await cameraRef.current.pausePreview();
-                setIsPreview(true);
-
-                let base64Img = `data:image/jpg;base64,${image}`;
-                let apiUrl =
-                    'http://servicios.aconcaguafoods.cl/Despacho/fotos';
-
-                let data1 = {
-                    file: base64Img,
-                    upload_preset: '<your-upload-preset>'
-                };
-
-                fetch(apiUrl, {
-                    body: JSON.stringify(data1),
-                    headers: {
-                        'content-type': 'application/json'
-                    },
-                    method: 'POST'
-                })
-                    .then(async response => {
-                        let data = await response.json();
-                        if (data.secure_url) {
-                            alert('Foto subida !!');
-                        }
-                    })
-                    .catch(err => {
-                        alert('No se puede cargar imagen');
-                    });
-            }
-        }
-    }
-
-
-    /* const saveImage = async () => {
         if (image) {
             try {
                 await MediaLibrary.createAssetAsync(image);
-
-                alert('Foto guardada! <3 ')
+                alert('Foto guardada! <3  <3')
                 setImage(null);
             } catch (e) {
                 console.log(e)
             }
         }
-    } */
+    }
 
     if (hasCameraPermission === false) {
         return <Text>No tienes acceso a la camara</Text>
@@ -99,7 +61,6 @@ export default function FotoCont() {
             setZoom(zoom - 0.005);
         }
     };
-
 
 
     return (
